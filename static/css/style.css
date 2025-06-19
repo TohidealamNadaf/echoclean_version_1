@@ -1,0 +1,170 @@
+/* Custom styles for EchoClean */
+
+.similarity-score {
+    position: relative;
+}
+
+.similarity-score .display-4 {
+    font-weight: 700;
+    background: linear-gradient(45deg, var(--bs-primary), var(--bs-info));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.result-badge {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+}
+
+.threshold-indicator {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.progress {
+    background-color: rgba(var(--bs-secondary-rgb), 0.2);
+}
+
+.progress-bar {
+    transition: width 0.6s ease;
+}
+
+.card {
+    border: 1px solid rgba(var(--bs-border-color-rgb), 0.125);
+    backdrop-filter: blur(10px);
+}
+
+.card-header {
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    border-bottom: 1px solid rgba(var(--bs-border-color-rgb), 0.125);
+}
+
+.btn {
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.toast {
+    min-width: 300px;
+}
+
+/* Animation for results */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeInUp 0.6s ease;
+}
+
+/* File input styling */
+.form-control:focus {
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+/* Loading state */
+.loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(var(--bs-primary-rgb), 0.2), transparent);
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2rem;
+    }
+    
+    .similarity-score .display-4 {
+        font-size: 2.5rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+}
+
+/* Status indicators */
+.status-success {
+    color: var(--bs-success);
+}
+
+.status-error {
+    color: var(--bs-danger);
+}
+
+.status-warning {
+    color: var(--bs-warning);
+}
+
+.status-info {
+    color: var(--bs-info);
+}
+
+/* Custom button states */
+.btn-outline-primary:disabled,
+.btn-outline-warning:disabled,
+.btn-success:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Enhance form controls */
+.form-control {
+    border-radius: 0.5rem;
+}
+
+.form-control:focus {
+    border-color: var(--bs-primary);
+}
+
+/* Similarity bar colors */
+.similarity-authentic {
+    background-color: var(--bs-success) !important;
+}
+
+.similarity-possible {
+    background-color: var(--bs-warning) !important;
+}
+
+.similarity-different {
+    background-color: var(--bs-danger) !important;
+}
+
+.similarity-deepfake {
+    background-color: var(--bs-dark) !important;
+}
