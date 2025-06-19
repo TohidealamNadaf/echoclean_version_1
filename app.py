@@ -149,21 +149,21 @@ def analyze():
         # Calculate similarity
         similarity = audio_processor.calculate_similarity(reference_embedding, target_embedding)
         
-        # Apply threshold logic
-        if similarity >= 0.90:
+        # Apply enhanced threshold logic for better deepfake detection
+        if similarity >= 0.85:
             result = "✅ Authentic"
             confidence = "High"
             color = "success"
-        elif 0.75 <= similarity < 0.90:
+        elif 0.65 <= similarity < 0.85:
             result = "⚠️ Possibly Different Speaker"
             confidence = "Medium"
             color = "warning"
-        elif 0.50 <= similarity < 0.75:
+        elif 0.35 <= similarity < 0.65:
             result = "❌ Different Speaker"
             confidence = "High"
             color = "danger"
         else:
-            result = "🚨 Deepfake or Corrupted Audio"
+            result = "🚨 Deepfake or Synthetic Audio"
             confidence = "Very High"
             color = "dark"
         
@@ -217,21 +217,21 @@ def compare_realtime():
             # Calculate similarity
             similarity = audio_processor.calculate_similarity(reference_embedding, target_embedding)
             
-            # Apply threshold logic for real-time feedback
-            if similarity >= 0.90:
+            # Apply enhanced threshold logic for real-time deepfake detection
+            if similarity >= 0.85:
                 result = "✅ Authentic"
                 confidence = "High"
                 color = "success"
-            elif 0.75 <= similarity < 0.90:
+            elif 0.65 <= similarity < 0.85:
                 result = "⚠️ Possibly Different Speaker"
                 confidence = "Medium"
                 color = "warning"
-            elif 0.50 <= similarity < 0.75:
+            elif 0.35 <= similarity < 0.65:
                 result = "❌ Different Speaker"
                 confidence = "High"
                 color = "danger"
             else:
-                result = "🚨 Deepfake or Corrupted Audio"
+                result = "🚨 Deepfake or Synthetic Audio"
                 confidence = "Very High"
                 color = "dark"
             
