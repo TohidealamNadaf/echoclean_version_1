@@ -292,13 +292,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Scalable Architecture**: Handles enterprise-level traffic
 - **Maintenance Friendly**: Clean, well-documented codebase
 
-## 📞 Support
-
-For support, feature requests, or bug reports:
-- Create an issue on GitHub
-- Contact: [your-email@domain.com]
-- Documentation: [Wiki](https://github.com/yourusername/echoclean/wiki)
-
 ## 🔄 Changelog
 
 ### v1.0.0 (Current)
