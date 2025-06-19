@@ -149,21 +149,21 @@ def analyze():
         # Calculate similarity
         similarity = audio_processor.calculate_similarity(reference_embedding, target_embedding)
         
-        # Apply enhanced threshold logic for better deepfake detection
-        if similarity >= 0.85:
-            result = "✅ Authentic"
+        # Apply adaptive threshold logic for better accuracy
+        if similarity >= 0.80:
+            result = "✅ Authentic Voice"
             confidence = "High"
             color = "success"
-        elif 0.65 <= similarity < 0.85:
-            result = "⚠️ Possibly Different Speaker"
+        elif 0.60 <= similarity < 0.80:
+            result = "⚠️ Possibly Same Speaker (Different Conditions)"
             confidence = "Medium"
             color = "warning"
-        elif 0.35 <= similarity < 0.65:
+        elif 0.30 <= similarity < 0.60:
             result = "❌ Different Speaker"
             confidence = "High"
             color = "danger"
         else:
-            result = "🚨 Deepfake or Synthetic Audio"
+            result = "🚨 Likely Deepfake or Synthetic Audio"
             confidence = "Very High"
             color = "dark"
         
@@ -206,8 +206,8 @@ def compare_realtime():
         file.save(filepath)
         
         try:
-            # Extract embedding from uploaded audio
-            target_embedding = audio_processor.extract_embedding(filepath)
+            # Extract embedding from uploaded audio with fast mode for real-time
+            target_embedding = audio_processor.extract_embedding(filepath, fast_mode=True)
             if target_embedding is None:
                 return jsonify({'error': 'Failed to process audio file'}), 400
             
@@ -217,21 +217,21 @@ def compare_realtime():
             # Calculate similarity
             similarity = audio_processor.calculate_similarity(reference_embedding, target_embedding)
             
-            # Apply enhanced threshold logic for real-time deepfake detection
-            if similarity >= 0.85:
-                result = "✅ Authentic"
+            # Apply adaptive threshold logic for real-time detection
+            if similarity >= 0.80:
+                result = "✅ Authentic Voice"
                 confidence = "High"
                 color = "success"
-            elif 0.65 <= similarity < 0.85:
-                result = "⚠️ Possibly Different Speaker"
+            elif 0.60 <= similarity < 0.80:
+                result = "⚠️ Possibly Same Speaker (Different Conditions)"
                 confidence = "Medium"
                 color = "warning"
-            elif 0.35 <= similarity < 0.65:
+            elif 0.30 <= similarity < 0.60:
                 result = "❌ Different Speaker"
                 confidence = "High"
                 color = "danger"
             else:
-                result = "🚨 Deepfake or Synthetic Audio"
+                result = "🚨 Likely Deepfake or Synthetic Audio"
                 confidence = "Very High"
                 color = "dark"
             
