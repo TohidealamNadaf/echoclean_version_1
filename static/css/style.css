@@ -1,4 +1,4 @@
-/* Custom styles for EchoClean */
+/* Custom styles for EchoClean with improved text visibility */
 
 .similarity-score {
     position: relative;
@@ -6,10 +6,8 @@
 
 .similarity-score .display-4 {
     font-weight: 700;
-    background: linear-gradient(45deg, var(--bs-primary), var(--bs-info));
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--bs-light) !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .result-badge {
@@ -34,13 +32,24 @@
 }
 
 .card {
-    border: 1px solid rgba(var(--bs-border-color-rgb), 0.125);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(10px);
+    background-color: rgba(0, 0, 0, 0.3) !important;
 }
 
 .card-header {
-    background-color: rgba(var(--bs-primary-rgb), 0.1);
-    border-bottom: 1px solid rgba(var(--bs-border-color-rgb), 0.125);
+    background-color: rgba(13, 110, 253, 0.2) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--bs-light) !important;
+}
+
+.card-body {
+    color: var(--bs-light) !important;
+}
+
+.card-title, .card h5, .card h6 {
+    color: var(--bs-light) !important;
+    font-weight: 600;
 }
 
 .btn {
@@ -118,21 +127,29 @@
     }
 }
 
-/* Status indicators */
+/* Status indicators with improved visibility */
 .status-success {
-    color: var(--bs-success);
+    color: #28a745 !important;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .status-error {
-    color: var(--bs-danger);
+    color: #dc3545 !important;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .status-warning {
-    color: var(--bs-warning);
+    color: #ffc107 !important;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .status-info {
-    color: var(--bs-info);
+    color: #17a2b8 !important;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 /* Custom button states */
@@ -143,13 +160,27 @@
     cursor: not-allowed;
 }
 
-/* Enhance form controls */
+/* Enhance form controls with better text visibility */
 .form-control {
     border-radius: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    color: var(--bs-light) !important;
 }
 
 .form-control:focus {
-    border-color: var(--bs-primary);
+    border-color: var(--bs-primary) !important;
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.form-text {
+    color: rgba(255, 255, 255, 0.7) !important;
+    font-size: 0.875rem;
 }
 
 /* Similarity bar colors */
@@ -167,4 +198,139 @@
 
 .similarity-deepfake {
     background-color: var(--bs-dark) !important;
+}
+
+/* Global text improvements for dark theme */
+body {
+    color: var(--bs-light) !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--bs-light) !important;
+    font-weight: 600;
+}
+
+p, span, div {
+    color: var(--bs-light) !important;
+}
+
+.text-muted {
+    color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.lead {
+    color: var(--bs-light) !important;
+    font-weight: 400;
+}
+
+.display-4 {
+    color: var(--bs-light) !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Button text improvements */
+.btn {
+    font-weight: 500;
+}
+
+.btn-outline-primary,
+.btn-outline-warning,
+.btn-outline-danger,
+.btn-outline-secondary,
+.btn-outline-info {
+    color: var(--bs-light) !important;
+    border-width: 2px;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-warning:hover,
+.btn-outline-danger:hover,
+.btn-outline-secondary:hover,
+.btn-outline-info:hover {
+    color: var(--bs-dark) !important;
+    font-weight: 600;
+}
+
+/* Alert and result text improvements */
+.alert {
+    border: 2px solid;
+    font-weight: 500;
+}
+
+.alert-success {
+    background-color: rgba(40, 167, 69, 0.2) !important;
+    border-color: #28a745 !important;
+    color: #28a745 !important;
+}
+
+.alert-warning {
+    background-color: rgba(255, 193, 7, 0.2) !important;
+    border-color: #ffc107 !important;
+    color: #ffc107 !important;
+}
+
+.alert-danger {
+    background-color: rgba(220, 53, 69, 0.2) !important;
+    border-color: #dc3545 !important;
+    color: #dc3545 !important;
+}
+
+.alert-dark {
+    background-color: rgba(108, 117, 125, 0.2) !important;
+    border-color: #6c757d !important;
+    color: #6c757d !important;
+}
+
+/* Toast improvements */
+.toast {
+    background-color: rgba(0, 0, 0, 0.9) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.toast-header {
+    background-color: rgba(13, 110, 253, 0.3) !important;
+    color: var(--bs-light) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.toast-body {
+    color: var(--bs-light) !important;
+    font-weight: 500;
+}
+
+/* Threshold legend improvements */
+.threshold-indicator {
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Result text improvements */
+#resultText {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* Progress bar text */
+.progress {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Small text improvements */
+small {
+    color: rgba(255, 255, 255, 0.8) !important;
+    font-weight: 500;
+}
+
+/* Audio controls improvements */
+audio {
+    filter: invert(1) hue-rotate(180deg);
+    border-radius: 0.5rem;
+}
+
+/* Recording status improvements */
+#recordingStatus, #referenceStatus, #targetStatus {
+    font-weight: 600;
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    margin-top: 0.5rem;
 }
