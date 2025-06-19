@@ -4,6 +4,9 @@ class EchoClean {
     constructor() {
         this.referenceUploaded = false;
         this.targetEmbedding = null;
+        this.mediaRecorder = null;
+        this.recordedChunks = [];
+        this.recordedBlob = null;
         this.initializeEventListeners();
         this.initializeToast();
     }
@@ -33,6 +36,19 @@ class EchoClean {
 
         document.getElementById('clearBtn').addEventListener('click', () => {
             this.clearSession();
+        });
+
+        // Recording button listeners
+        document.getElementById('recordBtn').addEventListener('click', () => {
+            this.startRecording();
+        });
+
+        document.getElementById('stopRecordBtn').addEventListener('click', () => {
+            this.stopRecording();
+        });
+
+        document.getElementById('realtimeCompareBtn').addEventListener('click', () => {
+            this.realtimeCompare();
         });
     }
 
@@ -120,48 +136,7 @@ class EchoClean {
         }
     }
 
-    async uploadTarget() {
-        const fileInput = document.getElementById('targetFile');
-        const uploadBtn = document.getElementById('uploadTargetBtn');
-        
-        if (!fileInput.files.length) {
-            this.showToast('Please select a target file first.', 'error');
-            return;
-        }
 
-        const formData = new FormData();
-        formData.append('file', fileInput.files[0]);
-
-        uploadBtn.disabled = true;
-        uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
-        this.updateStatus('target', 'Uploading and processing...', 'info');
-
-        try {
-            const response = await fetch('/upload-target', {
-                method: 'POST',
-                body: formData
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                this.targetEmbedding = data.embedding;
-                this.updateStatus('target', '✅ Target voice uploaded successfully', 'success');
-                this.showToast('Target voice uploaded and processed successfully!', 'success');
-                this.updateAnalyzeButton();
-            } else {
-                this.updateStatus('target', `❌ ${data.error}`, 'error');
-                this.showToast(data.error, 'error');
-            }
-        } catch (error) {
-            this.updateStatus('target', '❌ Upload failed', 'error');
-            this.showToast('Upload failed. Please try again.', 'error');
-            console.error('Upload error:', error);
-        } finally {
-            uploadBtn.disabled = false;
-            uploadBtn.innerHTML = '<i class="fas fa-upload me-2"></i>Upload Test Voice';
-        }
-    }
 
     async analyzeVoices() {
         if (!this.referenceUploaded || !this.targetEmbedding) {
@@ -312,6 +287,235 @@ class EchoClean {
     updateAnalyzeButton() {
         const analyzeBtn = document.getElementById('analyzeBtn');
         analyzeBtn.disabled = !(this.referenceUploaded && this.targetEmbedding);
+    }
+
+    async startRecording() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                audio: {
+                    sampleRate: 16000,
+                    channelCount: 1,
+                    volume: 1.0
+                } 
+            });
+            
+            this.recordedChunks = [];
+            this.mediaRecorder = new MediaRecorder(stream, {
+                mimeType: 'audio/webm;codecs=opus'
+            });
+            
+            this.mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    this.recordedChunks.push(event.data);
+                }
+            };
+            
+            this.mediaRecorder.onstop = () => {
+                this.recordedBlob = new Blob(this.recordedChunks, { type: 'audio/webm' });
+                this.handleRecordingComplete();
+                
+                // Stop all tracks to release microphone
+                stream.getTracks().forEach(track => track.stop());
+            };
+            
+            this.mediaRecorder.start();
+            
+            // Update UI
+            document.getElementById('recordBtn').disabled = true;
+            document.getElementById('stopRecordBtn').disabled = false;
+            this.updateStatus('recording', 'Recording... Speak now!', 'info');
+            
+            this.showToast('Recording started. Speak clearly into your microphone.', 'info');
+            
+        } catch (error) {
+            this.showToast('Failed to access microphone. Please allow microphone access.', 'error');
+            console.error('Recording error:', error);
+        }
+    }
+
+    stopRecording() {
+        if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+            this.mediaRecorder.stop();
+            
+            // Update UI
+            document.getElementById('recordBtn').disabled = false;
+            document.getElementById('stopRecordBtn').disabled = true;
+            this.updateStatus('recording', 'Processing recording...', 'info');
+        }
+    }
+
+    handleRecordingComplete() {
+        if (!this.recordedBlob) return;
+        
+        // Create audio playback
+        const audioPlayback = document.getElementById('audioPlayback');
+        const audioUrl = URL.createObjectURL(this.recordedBlob);
+        audioPlayback.src = audioUrl;
+        audioPlayback.style.display = 'block';
+        
+        // Enable upload button for recorded audio
+        document.getElementById('uploadTargetBtn').disabled = false;
+        
+        // Enable real-time compare if reference is uploaded
+        if (this.referenceUploaded) {
+            document.getElementById('realtimeCompareBtn').disabled = false;
+        }
+        
+        this.updateStatus('recording', '✅ Recording complete! You can upload or compare instantly.', 'success');
+        this.showToast('Recording completed successfully!', 'success');
+    }
+
+    async uploadTarget() {
+        const fileInput = document.getElementById('targetFile');
+        const uploadBtn = document.getElementById('uploadTargetBtn');
+        
+        let formData = new FormData();
+        
+        // Check if we have a recorded audio or file upload
+        if (this.recordedBlob) {
+            // Convert recorded blob to WAV and upload
+            formData.append('file', this.recordedBlob, 'recorded_audio.webm');
+        } else if (fileInput.files.length > 0) {
+            formData.append('file', fileInput.files[0]);
+        } else {
+            this.showToast('Please select a file or record audio first.', 'error');
+            return;
+        }
+
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
+        this.updateStatus('target', 'Uploading and processing...', 'info');
+
+        try {
+            const response = await fetch('/upload-target', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                this.targetEmbedding = data.embedding;
+                this.updateStatus('target', '✅ Target voice uploaded successfully', 'success');
+                this.showToast('Target voice uploaded and processed successfully!', 'success');
+                this.updateAnalyzeButton();
+            } else {
+                this.updateStatus('target', `❌ ${data.error}`, 'error');
+                this.showToast(data.error, 'error');
+            }
+        } catch (error) {
+            this.updateStatus('target', '❌ Upload failed', 'error');
+            this.showToast('Upload failed. Please try again.', 'error');
+            console.error('Upload error:', error);
+        } finally {
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML = '<i class="fas fa-upload me-2"></i>Upload Test Voice';
+        }
+    }
+
+    updateStatus(type, message, status) {
+        const statusDiv = document.getElementById(`${type}Status`);
+        if (statusDiv) {
+            statusDiv.innerHTML = message;
+            statusDiv.className = status ? `status-${status}` : '';
+        }
+        
+        // Also update recording status if it's a recording update
+        if (type === 'recording') {
+            const recordingStatusDiv = document.getElementById('recordingStatus');
+            if (recordingStatusDiv) {
+                recordingStatusDiv.innerHTML = message;
+                recordingStatusDiv.className = status ? `status-${status}` : '';
+            }
+        }
+    }
+
+    resetInterface() {
+        // Reset state
+        this.referenceUploaded = false;
+        this.targetEmbedding = null;
+        this.recordedBlob = null;
+        this.recordedChunks = [];
+
+        // Reset file inputs
+        document.getElementById('referenceFile').value = '';
+        document.getElementById('targetFile').value = '';
+
+        // Reset buttons
+        document.getElementById('uploadReferenceBtn').disabled = true;
+        document.getElementById('uploadTargetBtn').disabled = true;
+        document.getElementById('analyzeBtn').disabled = true;
+        document.getElementById('recordBtn').disabled = false;
+        document.getElementById('stopRecordBtn').disabled = true;
+        document.getElementById('realtimeCompareBtn').disabled = true;
+
+        // Clear status messages
+        this.updateStatus('reference', '', '');
+        this.updateStatus('target', '', '');
+        this.updateStatus('recording', '', '');
+
+        // Hide audio playback
+        document.getElementById('audioPlayback').style.display = 'none';
+
+        // Hide results
+        document.getElementById('resultsSection').style.display = 'none';
+        document.getElementById('analysisProgress').style.display = 'none';
+
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async realtimeCompare() {
+        if (!this.referenceUploaded) {
+            this.showToast('Please upload a reference voice first.', 'error');
+            return;
+        }
+
+        if (!this.recordedBlob) {
+            this.showToast('Please record audio first.', 'error');
+            return;
+        }
+
+        const compareBtn = document.getElementById('realtimeCompareBtn');
+        compareBtn.disabled = true;
+        compareBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Comparing...';
+
+        try {
+            const formData = new FormData();
+            formData.append('file', this.recordedBlob, 'realtime_audio.webm');
+
+            const response = await fetch('/compare-realtime', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Show instant results in a toast and brief display
+                this.showToast(`Real-time result: ${data.result} (${(data.similarity * 100).toFixed(1)}%)`, 
+                              data.color === 'success' ? 'success' : 'warning');
+                
+                // Update recording status with instant feedback
+                this.updateStatus('recording', 
+                    `🚀 Real-time: ${data.result} - ${(data.similarity * 100).toFixed(1)}% match`, 
+                    data.color === 'success' ? 'success' : 
+                    data.color === 'warning' ? 'warning' : 'error');
+                
+                // Optionally show full results if available
+                if (document.getElementById('resultsSection').style.display === 'none') {
+                    this.displayResults(data);
+                }
+            } else {
+                this.showToast(data.error, 'error');
+            }
+        } catch (error) {
+            this.showToast('Real-time comparison failed. Please try again.', 'error');
+            console.error('Real-time comparison error:', error);
+        } finally {
+            compareBtn.disabled = false;
+            compareBtn.innerHTML = '<i class="fas fa-bolt me-2"></i>Real-time Compare';
+        }
     }
 
     showToast(message, type = 'info') {

@@ -56,10 +56,30 @@
                         </h5>
                     </div>
                     <div class="card-body">
-                        <p class="text-muted mb-3">Upload the voice to be authenticated</p>
+                        <p class="text-muted mb-3">Upload or record the voice to be authenticated</p>
                         <div class="mb-3">
                             <input type="file" class="form-control" id="targetFile" accept=".wav,.mp3,.flac,.m4a,.ogg">
                             <div class="form-text">Supported formats: WAV, MP3, FLAC, M4A, OGG (Max 16MB)</div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex gap-2 flex-wrap">
+                                <button type="button" class="btn btn-outline-danger" id="recordBtn">
+                                    <i class="fas fa-microphone me-2"></i>
+                                    Record Voice
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" id="stopRecordBtn" disabled>
+                                    <i class="fas fa-stop me-2"></i>
+                                    Stop Recording
+                                </button>
+                                <button type="button" class="btn btn-outline-info" id="realtimeCompareBtn" disabled>
+                                    <i class="fas fa-bolt me-2"></i>
+                                    Real-time Compare
+                                </button>
+                            </div>
+                            <div id="recordingStatus" class="mt-2"></div>
+                        </div>
+                        <div class="mb-3">
+                            <audio id="audioPlayback" controls style="width: 100%; display: none;"></audio>
                         </div>
                         <button type="button" class="btn btn-outline-warning" id="uploadTargetBtn" disabled>
                             <i class="fas fa-upload me-2"></i>

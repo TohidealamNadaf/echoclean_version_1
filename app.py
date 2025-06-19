@@ -81,7 +81,7 @@ def upload_reference():
         # For simplicity, we'll store in session
         from flask import session
         session['reference_file'] = filepath
-        session['reference_embedding'] = embedding.tolist()
+        session['reference_embedding'] = embedding if isinstance(embedding, list) else embedding.tolist()
         
         app.logger.info(f"Reference file uploaded: {filename}")
         return jsonify({
@@ -123,7 +123,7 @@ def upload_target():
             'success': True,
             'message': 'Target voice uploaded successfully',
             'filename': filename,
-            'embedding': embedding.tolist()
+            'embedding': embedding if isinstance(embedding, list) else embedding.tolist()
         })
         
     except Exception as e:
@@ -182,6 +182,80 @@ def analyze():
     except Exception as e:
         app.logger.error(f"Error during analysis: {str(e)}")
         return jsonify({'error': f'Analysis failed: {str(e)}'}), 500
+
+@app.route('/compare-realtime', methods=['POST'])
+def compare_realtime():
+    """Real-time voice comparison for instant feedback"""
+    try:
+        from flask import session
+        
+        # Check if reference embedding exists
+        if 'reference_embedding' not in session:
+            return jsonify({'error': 'No reference voice uploaded. Please upload a reference file first.'}), 400
+        
+        if 'file' not in request.files:
+            return jsonify({'error': 'No audio file provided'}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No file selected'}), 400
+        
+        # Generate temporary filename for real-time comparison
+        filename = secure_filename(f"realtime_{uuid.uuid4().hex}_{file.filename}")
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+        
+        try:
+            # Extract embedding from uploaded audio
+            target_embedding = audio_processor.extract_embedding(filepath)
+            if target_embedding is None:
+                return jsonify({'error': 'Failed to process audio file'}), 400
+            
+            # Get reference embedding
+            reference_embedding = session['reference_embedding']
+            
+            # Calculate similarity
+            similarity = audio_processor.calculate_similarity(reference_embedding, target_embedding)
+            
+            # Apply threshold logic for real-time feedback
+            if similarity >= 0.90:
+                result = "✅ Authentic"
+                confidence = "High"
+                color = "success"
+            elif 0.75 <= similarity < 0.90:
+                result = "⚠️ Possibly Different Speaker"
+                confidence = "Medium"
+                color = "warning"
+            elif 0.50 <= similarity < 0.75:
+                result = "❌ Different Speaker"
+                confidence = "High"
+                color = "danger"
+            else:
+                result = "🚨 Deepfake or Corrupted Audio"
+                confidence = "Very High"
+                color = "dark"
+            
+            app.logger.info(f"Real-time comparison: {result}, Similarity: {similarity:.4f}")
+            
+            return jsonify({
+                'success': True,
+                'similarity': round(similarity, 4),
+                'result': result,
+                'confidence': confidence,
+                'color': color,
+                'realtime': True
+            })
+            
+        finally:
+            # Clean up temporary file
+            try:
+                os.remove(filepath)
+            except:
+                pass
+        
+    except Exception as e:
+        app.logger.error(f"Error during real-time comparison: {str(e)}")
+        return jsonify({'error': f'Real-time comparison failed: {str(e)}'}), 500
 
 @app.route('/clear-session', methods=['POST'])
 def clear_session():
